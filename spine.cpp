@@ -641,6 +641,20 @@ Ref<Spine::SpineResource> Spine::get_resource() {
 	return res;
 }
 
+Array Spine::get_animation_names() const {
+
+	Array names;
+
+	if ( state != NULL) {
+		for (int i = 0; i < state->data->skeletonData->animationsCount; i++) {
+			spAnimation* anim = state->data->skeletonData->animations[i];
+			names.push_back(anim->name);
+		}
+	}
+
+	return names;
+}
+
 bool Spine::has(const String& p_name) {
 
 	if (skeleton==NULL) return false;
@@ -1148,6 +1162,8 @@ void Spine::_bind_methods() {
 
 	ObjectTypeDB::bind_method(_MD("set_resource", "spine"), &Spine::set_resource);
 	ObjectTypeDB::bind_method(_MD("get_resource"), &Spine::get_resource);
+
+	ObjectTypeDB::bind_method(_MD("get_animation_names"), &Spine::get_animation_names);
 
 	ObjectTypeDB::bind_method(_MD("has", "name"), &Spine::has);
 	ObjectTypeDB::bind_method(_MD("mix", "from", "to", "duration"), &Spine::mix, 0);

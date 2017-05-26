@@ -142,6 +142,8 @@ public:
 	void set_resource(Ref<SpineResource> p_data);
 	Ref<SpineResource> get_resource();
 
+	Array get_animation_names() const;
+
 	bool has(const String& p_name);
 	void mix(const String& p_from, const String& p_to, real_t p_duration);
 
