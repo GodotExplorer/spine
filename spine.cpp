@@ -616,7 +616,7 @@ void Spine::set_resource(Ref<Spine::SpineResource> p_data) {
 	_spine_dispose();
 
 	res = p_data;
-	if (res.is_null())
+	if (res.is_null() || !res->data)
 		return;
 
 	skeleton = spSkeleton_create(res->data);
