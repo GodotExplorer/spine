@@ -124,6 +124,7 @@ private:
 	void _animation_draw();
 	void _set_process(bool p_process, bool p_force = false);
 	void _on_fx_draw();
+	void _update_verties_count();
 
 protected:
 	static Array *invalid_names;

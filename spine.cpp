@@ -626,6 +626,8 @@ void Spine::set_resource(Ref<Spine::SpineResource> p_data) {
 	state->rendererObject = this;
 	state->listener = spine_animation_callback;
 
+	_update_verties_count();
+
 	if (skin != "")
 		set_skin(skin);
 	if (current_animation != "[stop]")
@@ -1282,6 +1284,33 @@ Rect2 Spine::get_item_rect() const {
 
 	int h = maxY - minY;
 	return attached ? Rect2(minX, -minY - h, maxX - minX, h) : Node2D::get_item_rect();
+}
+
+void Spine::_update_verties_count() {
+
+	ERR_FAIL_COND(skeleton == NULL);
+
+	int verties_count = 0;
+	for(int i = 0, n = skeleton->slotsCount; i < n; i++) {
+
+		spSlot* slot = skeleton->drawOrder[i];
+		if (!slot->attachment)
+			continue;
+		
+		switch (slot->attachment->type) {
+
+			case SP_ATTACHMENT_MESH:
+			case SP_ATTACHMENT_LINKED_MESH:
+			case SP_ATTACHMENT_BOUNDING_BOX:
+				verties_count = MAX(verties_count, ((spVertexAttachment*)slot->attachment)->verticesCount + 1);
+				break;
+			default:
+				continue;
+		}
+	}
+
+	if(verties_count > world_verts.size())
+		world_verts.resize(verties_count);
 }
 
 Spine::Spine()
