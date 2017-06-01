@@ -1266,7 +1266,7 @@ Rect2 Spine::get_item_rect() const {
 		else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, world_verts.ptr());
-			verticesCount = ((spVertexAttachment*)mesh)->verticesCount;
+			verticesCount = ((spVertexAttachment*)mesh)->worldVerticesLength;
 		}
 		else
 			continue;
@@ -1309,8 +1309,11 @@ void Spine::_update_verties_count() {
 		}
 	}
 
-	if(verties_count > world_verts.size())
+	if(verties_count > world_verts.size()){
 		world_verts.resize(verties_count);
+		memset(world_verts.ptr(),0,world_verts.size() * sizeof(float));
+	}
+		
 }
 
 Spine::Spine()
@@ -1324,7 +1327,7 @@ Spine::Spine()
 	state = NULL;
 	res = RES();
 	world_verts.resize(1000); // Max number of vertices per mesh.
-
+	memset(world_verts.ptr(),0,world_verts.size() * sizeof(float) );
 	speed_scale = 1;
 	autoplay = "";
 	animation_process_mode = ANIMATION_PROCESS_IDLE;
