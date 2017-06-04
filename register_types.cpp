@@ -63,7 +63,7 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self) {
 char* _spUtil_readFile(const char* p_path, int* p_length) {
 	FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
 	ERR_FAIL_COND_V(!f, NULL);
-	
+
 	String str_path = String::utf8(p_path);
 
 	char *data = (char *)_malloc(*p_length, __FILE__, __LINE__);
@@ -71,7 +71,7 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 	data = (char *)_malloc(*p_length, __FILE__, __LINE__);
 	ERR_FAIL_COND_V(data == NULL, NULL);
 	f->get_buffer((uint8_t *)data, *p_length);
-	
+
 	/*
 	 * A pretty hacky part of patching Spine files
 	 * Preface: If I create spine atlas from images with some deep
@@ -90,7 +90,7 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 	 * - may be find actual reason of my buggy animations
 	 *
 	 */
-	
+
 	Array _sp_invalid_names = Spine::get_invalid_names();
 	if (str_path.ends_with(".atlas")){
 		Array current_string = Array();
@@ -125,7 +125,7 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 					if (data[i-k] != (int)(in[idx-k])){ match=false; break; }
 				}
 				if (!match) continue;
-				
+
 				IntArray extra_replaces;
 				for (int k=1; k<in.size()-idx;k++){
 					if (i+k >= *p_length){ match=false; break; }
@@ -140,7 +140,7 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 				}
 			}
 		}
-		
+
 		_sp_invalid_names.resize(0);
 	}
 	memdelete(f);
@@ -149,6 +149,8 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 
 static void *spine_malloc(size_t p_size) {
 
+	if (p_size == 0)
+		return NULL;
 	return memalloc(p_size);
 }
 
@@ -169,12 +171,12 @@ public:
 		String p_atlas = p_path.basename() + ".atlas";
 		res->atlas = spAtlas_createFromFile(p_atlas.utf8().get_data(), 0);
 		ERR_FAIL_COND_V(res->atlas == NULL, RES());
-		
+
 		if (p_path.extension() == "json"){
 			spSkeletonJson *json = spSkeletonJson_create(res->atlas);
 			ERR_FAIL_COND_V(json == NULL, RES());
 			json->scale = 1;
-			
+
 			res->data = spSkeletonJson_readSkeletonDataFile(json, p_path.utf8().get_data());
 			ERR_EXPLAIN(json->error ? json->error : "");
 			spSkeletonJson_dispose(json);
@@ -188,7 +190,7 @@ public:
 			spSkeletonBinary_dispose(bin);
 			ERR_FAIL_COND_V(res->data == NULL, RES());
 		}
-			
+
 		res->set_path(p_path);
 		float finish = OS::get_singleton()->get_ticks_msec();
 		print_line("Spine resource (" + p_path + ") loaded in " + itos(finish-start) + " msecs");

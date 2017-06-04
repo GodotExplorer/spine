@@ -612,12 +612,16 @@ void Spine::_notification(int p_what) {
 
 void Spine::set_resource(Ref<Spine::SpineResource> p_data) {
 
-	// cleanup
-	_spine_dispose();
+	if (res == p_data)
+		return;
+
+	_spine_dispose(); // cleanup
 
 	res = p_data;
-	if (res.is_null() || !res->data)
+	if (res.is_null())
 		return;
+
+	ERR_FAIL_COND(!res->data);
 
 	skeleton = spSkeleton_create(res->data);
 	root_bone = skeleton->bones[0];
