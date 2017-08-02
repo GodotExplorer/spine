@@ -28,8 +28,8 @@
 /*************************************************************************/
 #ifdef MODULE_SPINE_ENABLED
 
-#include "object_type_db.h"
-#include "core/globals.h"
+#include <core/class_db.h>
+#include <core/project_settings.h>
 #include "register_types.h"
 
 #include <spine/extension.h>
@@ -46,7 +46,7 @@ typedef Ref<Texture> TextureRef;
 void _spAtlasPage_createTexture(spAtlasPage* self, const char* path) {
 
 	TextureRef *ref = memnew(TextureRef);
-	*ref = ResourceLoader::load(path, "Texture");
+	*ref = ResourceLoader::load(path);
 	ERR_FAIL_COND(ref->is_null());
 	self->rendererObject = ref;
 	self->width = (*ref)->get_width();
@@ -126,7 +126,7 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 				}
 				if (!match) continue;
 
-				IntArray extra_replaces;
+				Vector<int> extra_replaces;
 				for (int k=1; k<in.size()-idx;k++){
 					if (i+k >= *p_length){ match=false; break; }
 					if (data[i+k] != (int)(in[idx+k])) { match=false; break; }
@@ -168,11 +168,11 @@ public:
 		float start = OS::get_singleton()->get_ticks_msec();
 		Spine::SpineResource *res = memnew(Spine::SpineResource);
 		Ref<Spine::SpineResource> ref(res);
-		String p_atlas = p_path.basename() + ".atlas";
+		String p_atlas = p_path.get_basename() + ".atlas";
 		res->atlas = spAtlas_createFromFile(p_atlas.utf8().get_data(), 0);
 		ERR_FAIL_COND_V(res->atlas == NULL, RES());
 
-		if (p_path.extension() == "json"){
+		if (p_path.get_extension() == "json"){
 			spSkeletonJson *json = spSkeletonJson_create(res->atlas);
 			ERR_FAIL_COND_V(json == NULL, RES());
 			json->scale = 1;
@@ -210,7 +210,7 @@ public:
 
 	virtual String get_resource_type(const String &p_path) const {
 
-		String el = p_path.extension().to_lower();
+		String el = p_path.get_extension().to_lower();
 		if (el=="json" || el=="skel")
 			return "SpineResource";
 		return "";
@@ -221,8 +221,8 @@ static ResourceFormatLoaderSpine *resource_loader_spine = NULL;
 
 void register_spine_types() {
 
-	ObjectTypeDB::register_type<Spine>();
-	ObjectTypeDB::register_type<Spine::SpineResource>();
+	ClassDB::register_class<Spine>();
+	ClassDB::register_class<Spine::SpineResource>();
 	resource_loader_spine = memnew( ResourceFormatLoaderSpine );
 	ResourceLoader::add_resource_format_loader(resource_loader_spine);
 

@@ -39,7 +39,7 @@ SpineBatcher::SetBlendMode::SetBlendMode(int p_mode) {
 
 void SpineBatcher::SetBlendMode::draw(RID ci) {
 
-	VisualServer::get_singleton()->canvas_item_add_set_blend_mode(ci, VS::MaterialBlendMode(mode));
+	// VisualServer::get_singleton()->canvas_item_add_set_blend_mode(ci, VS::MaterialBlendMode(mode));
 }
 
 SpineBatcher::Elements::Elements() {
@@ -63,14 +63,30 @@ SpineBatcher::Elements::~Elements() {
 
 void SpineBatcher::Elements::draw(RID ci) {
 
-	VisualServer::get_singleton()->canvas_item_add_triangle_array_ptr(ci,
-		indies_count / 3,
-		indies,
-		vertices,
-		colors,
-		uvs,
+	Vector<int> p_indices;
+	p_indices.resize(indies_count);
+	memcpy(p_indices.ptr(), indies, indies_count * sizeof(int) );
+
+	Vector<Vector2> p_points;
+	p_points.resize(vertices_count);
+	memcpy(p_points.ptr(), vertices, vertices_count * sizeof(Vector2));
+
+	Vector<Color> p_colors;
+	p_colors.resize(vertices_count);
+	memcpy(p_colors.ptr(), colors, vertices_count * sizeof(Color));
+
+	Vector<Vector2> p_uvs;
+	p_uvs.resize(vertices_count);
+	memcpy(p_uvs.ptr(), uvs, vertices_count * sizeof(Vector2));
+
+	VisualServer::get_singleton()->canvas_item_add_triangle_array(ci,
+		p_indices,
+		p_points,
+		p_colors,
+		p_uvs,
 		texture->get_rid()
 	);
+
 }
 
 void SpineBatcher::add(Ref<Texture> p_texture,
@@ -81,7 +97,7 @@ void SpineBatcher::add(Ref<Texture> p_texture,
 	if (p_texture != elements->texture
 		|| elements->vertices_count + (p_vertices_count >> 1) > BATCH_CAPACITY
 		|| elements->indies_count + p_indies_count > BATCH_CAPACITY * 3) {
-	
+
 		push_elements();
 		elements->texture = p_texture;
 	}

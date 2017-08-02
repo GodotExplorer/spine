@@ -31,7 +31,7 @@
 #include "core/io/resource_loader.h"
 #include "scene/2d/collision_object_2d.h"
 #include "scene/resources/convex_polygon_shape_2d.h"
-#include "method_bind_ext.inc"
+#include <core/method_bind_ext.gen.inc>
 
 #include "spine.h"
 #include <spine/spine.h>
@@ -55,7 +55,7 @@ Spine::SpineResource::~SpineResource() {
 Array *Spine::invalid_names = NULL;
 Array Spine::get_invalid_names(){
 	if (invalid_names==NULL){
-		invalid_names = memnew(Array(true));
+		invalid_names = memnew(Array());
 	}
 	return *invalid_names;
 }
@@ -111,7 +111,7 @@ void Spine::_spine_dispose() {
 	res = RES();
 
 	for (AttachmentNodes::Element *E = attachment_nodes.front(); E; E = E->next()) {
-		
+
 		AttachmentNode& node = E->get();
 		memdelete(node.ref);
 	}
@@ -142,7 +142,7 @@ void Spine::_on_fx_draw() {
 		return;
 	fx_batcher.reset();
 	RID eci = fx_node->get_canvas_item();
-	VisualServer::get_singleton()->canvas_item_add_set_blend_mode(eci, VS::MaterialBlendMode(fx_node->get_blend_mode()));
+	// VisualServer::get_singleton()->canvas_item_add_set_blend_mode(eci, VS::MaterialBlendMode(fx_node->get_blend_mode()));
 	fx_batcher.flush();
 }
 
@@ -167,7 +167,7 @@ void Spine::_animation_draw() {
 
 	RID ci = this->get_canvas_item();
 	batcher.reset();
-	VisualServer::get_singleton()->canvas_item_add_set_blend_mode(ci, VS::MaterialBlendMode(get_blend_mode()));
+	// VisualServer::get_singleton()->canvas_item_add_set_blend_mode(ci, VS::MaterialBlendMode(get_blend_mode()));
 
 	const char *fx_prefix = fx_slot_prefix.get_data();
 
@@ -180,9 +180,9 @@ void Spine::_animation_draw() {
 		switch (slot->attachment->type) {
 
 			case SP_ATTACHMENT_REGION: {
-				
+
 				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				is_fx = strstr(attachment->path, fx_prefix) != NULL;					
+				is_fx = strstr(attachment->path, fx_prefix) != NULL;
 				spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptr());
 				texture = spine_get_texture(attachment);
 				uvs = attachment->uvs;
@@ -199,11 +199,11 @@ void Spine::_animation_draw() {
 			case SP_ATTACHMENT_MESH: {
 
 				spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-				is_fx = strstr(attachment->path, fx_prefix) != NULL;					
+				is_fx = strstr(attachment->path, fx_prefix) != NULL;
 				spMeshAttachment_computeWorldVertices(attachment, slot, world_verts.ptr());
 				texture = spine_get_texture(attachment);
 				uvs = attachment->uvs;
-				verties_count = ((spVertexAttachment*)attachment)->verticesCount;
+				verties_count = ((spVertexAttachment*)attachment)->worldVerticesLength;
 				triangles = attachment->triangles;
 				triangles_count = attachment->trianglesCount;
 				r = attachment->r;
@@ -239,7 +239,7 @@ void Spine::_animation_draw() {
 		}
 		 */
 
-		color.a = skeleton->a * slot->a * a * get_opacity();
+		color.a = skeleton->a * slot->a * a;
 		color.r = skeleton->r * slot->r * r;
 		color.g = skeleton->g * slot->g * g;
 		color.b = skeleton->b * slot->b * b;
@@ -431,7 +431,7 @@ bool Spine::_set(const StringName& p_name, const Variant& p_value) {
 
 			if (which == "[stop]")
 				stop();
-			else if (has(which)) {
+			else if (has_animation(which)) {
 				reset();
 				play(which, 1, loop);
 			}
@@ -441,7 +441,7 @@ bool Spine::_set(const StringName& p_name, const Variant& p_value) {
 	else if (name == "playback/loop") {
 
 		loop = p_value;
-		if (skeleton != NULL && has(current_animation))
+		if (skeleton != NULL && has_animation(current_animation))
 			play(current_animation, 1, loop);
 	}
 	else if (name == "playback/forward") {
@@ -501,7 +501,7 @@ float Spine::get_animation_length(String p_animation) const {
 		}
 	}
 	return 0;
-	
+
 }
 
 void Spine::_get_property_list(List<PropertyInfo> *p_list) const {
@@ -578,7 +578,7 @@ void Spine::_notification(int p_what) {
 		fx_node->set_z_as_relative(false);
 		add_child(fx_node);
 
-		if (!get_tree()->is_editor_hint() && has(autoplay)) {
+		if (!get_tree()->is_editor_hint() && has_animation(autoplay)) {
 			play(autoplay);
 		}
 	} break;
@@ -661,7 +661,7 @@ Array Spine::get_animation_names() const {
 	return names;
 }
 
-bool Spine::has(const String& p_name) {
+bool Spine::has_animation(const String& p_name) {
 
 	if (skeleton==NULL) return false;
 	spAnimation* animation = spSkeletonData_findAnimation(skeleton->data, p_name.utf8().get_data());
@@ -901,7 +901,7 @@ Dictionary Spine::get_attachment(const String& p_slot_name, const String& p_atta
 			dict["region"] = Rect2(info->regionOffsetX, info->regionOffsetY, info->regionWidth, info->regionHeight);
 			dict["region_original_size"] = Size2(info->regionOriginalWidth, info->regionOriginalHeight);
 
-			Vector2Array offset, uvs;
+			Vector<Vector2> offset, uvs;
 			for (int idx = 0; idx < 4; idx++) {
 				offset.push_back(Vector2(info->offset[idx * 2], info->offset[idx * 2 + 1]));
 				uvs.push_back(Vector2(info->uvs[idx * 2], info->uvs[idx * 2 + 1]));
@@ -916,9 +916,9 @@ Dictionary Spine::get_attachment(const String& p_slot_name, const String& p_atta
 			spVertexAttachment *info = (spVertexAttachment *)attachment;
 			dict["type"] = "bounding_box";
 
-			Vector2Array vertices;
+			Vector<Vector2> vertices;
 			for (int idx = 0; idx < info->verticesCount / 2; idx++)
-				vertices.append(Vector2(info->vertices[idx * 2], -info->vertices[idx * 2 + 1]));
+				vertices.push_back(Vector2(info->vertices[idx * 2], -info->vertices[idx * 2 + 1]));
 			dict["vertices"] = vertices;
 		} break;
 
@@ -1076,7 +1076,7 @@ bool Spine::add_bounding_box(const String& p_bone_name, const String& p_slot_nam
 	Ref<Shape2D> shape = get_bounding_box(p_slot_name, p_attachment_name);
 	if (shape.is_null())
 		return false;
-	node->add_shape(shape);
+	node->shape_owner_add_shape(0, shape);
 
 	return add_attachment_node(p_bone_name, p_node);
 }
@@ -1166,75 +1166,70 @@ bool Spine::is_debug_attachment(DebugAttachmentMode p_mode) const {
 
 void Spine::_bind_methods() {
 
-	ObjectTypeDB::bind_method(_MD("set_resource", "spine"), &Spine::set_resource);
-	ObjectTypeDB::bind_method(_MD("get_resource"), &Spine::get_resource);
+	ClassDB::bind_method(D_METHOD("set_resource", "spine"), &Spine::set_resource);
+	ClassDB::bind_method(D_METHOD("get_resource"), &Spine::get_resource);
 
-	ObjectTypeDB::bind_method(_MD("get_animation_names"), &Spine::get_animation_names);
+	ClassDB::bind_method(D_METHOD("get_animation_names"), &Spine::get_animation_names);
+	ClassDB::bind_method(D_METHOD("has_animation", "name"), &Spine::has_animation);
 
-	ObjectTypeDB::bind_method(_MD("has", "name"), &Spine::has);
-	ObjectTypeDB::bind_method(_MD("mix", "from", "to", "duration"), &Spine::mix, 0);
-	ObjectTypeDB::bind_method(_MD("play", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
-	ObjectTypeDB::bind_method(_MD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
-	ObjectTypeDB::bind_method(_MD("clear", "track"), &Spine::clear);
-	ObjectTypeDB::bind_method(_MD("stop"), &Spine::stop);
-	ObjectTypeDB::bind_method(_MD("is_playing", "track"), &Spine::is_playing);
+	ClassDB::bind_method(D_METHOD("mix", "from", "to", "duration"), &Spine::mix, 0);
+	ClassDB::bind_method(D_METHOD("play", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("clear", "track"), &Spine::clear);
+	ClassDB::bind_method(D_METHOD("stop"), &Spine::stop);
+	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing);
 
-	ObjectTypeDB::bind_method(_MD("get_current_animation"), &Spine::get_current_animation);
-	ObjectTypeDB::bind_method(_MD("stop_all"), &Spine::stop_all);
-	ObjectTypeDB::bind_method(_MD("reset"), &Spine::reset);
-	ObjectTypeDB::bind_method(_MD("seek", "pos"), &Spine::seek);
-	ObjectTypeDB::bind_method(_MD("tell"), &Spine::tell);
-	ObjectTypeDB::bind_method(_MD("set_active", "active"), &Spine::set_active);
-	ObjectTypeDB::bind_method(_MD("is_active"), &Spine::is_active);
-	ObjectTypeDB::bind_method(_MD("get_animation_length", "animation"), &Spine::get_animation_length);
-	ObjectTypeDB::bind_method(_MD("set_speed", "speed"), &Spine::set_speed);
-	ObjectTypeDB::bind_method(_MD("get_speed"), &Spine::get_speed);
-	ObjectTypeDB::bind_method(_MD("set_skip_frames", "frames"), &Spine::set_skip_frames);
-	ObjectTypeDB::bind_method(_MD("get_skip_frames"), &Spine::get_skip_frames);
-	ObjectTypeDB::bind_method(_MD("set_modulate", "modulate"), &Spine::set_modulate);
-	ObjectTypeDB::bind_method(_MD("get_modulate"), &Spine::get_modulate);
-	ObjectTypeDB::bind_method(_MD("set_flip_x", "modulate"), &Spine::set_flip_x);
-	ObjectTypeDB::bind_method(_MD("is_flip_x"), &Spine::is_flip_x);
-	ObjectTypeDB::bind_method(_MD("set_flip_y", "modulate"), &Spine::set_flip_y);
-	ObjectTypeDB::bind_method(_MD("is_flip_y"), &Spine::is_flip_y);
-	ObjectTypeDB::bind_method(_MD("set_skin", "skin"), &Spine::set_skin);
-	ObjectTypeDB::bind_method(_MD("set_animation_process_mode","mode"),&Spine::set_animation_process_mode);
-	ObjectTypeDB::bind_method(_MD("get_animation_process_mode"),&Spine::get_animation_process_mode);
-	ObjectTypeDB::bind_method(_MD("get_skeleton"), &Spine::get_skeleton);
-	ObjectTypeDB::bind_method(_MD("get_attachment", "slot_name", "attachment_name"), &Spine::get_attachment);
-	ObjectTypeDB::bind_method(_MD("get_bone", "bone_name"), &Spine::get_bone);
-	ObjectTypeDB::bind_method(_MD("get_slot", "slot_name"), &Spine::get_slot);
-	ObjectTypeDB::bind_method(_MD("set_attachment", "slot_name", "attachment"), &Spine::set_attachment);
-	ObjectTypeDB::bind_method(_MD("has_attachment_node", "bone_name", "node"), &Spine::has_attachment_node);
-	ObjectTypeDB::bind_method(_MD("add_attachment_node", "bone_name", "node", "ofs", "scale", "rot"), &Spine::add_attachment_node, Vector2(0, 0), Vector2(1, 1), 0);
-	ObjectTypeDB::bind_method(_MD("remove_attachment_node", "p_bone_name", "node"), &Spine::remove_attachment_node);
-	ObjectTypeDB::bind_method(_MD("get_bounding_box", "slot_name", "attachment_name"), &Spine::get_bounding_box);
-	ObjectTypeDB::bind_method(_MD("add_bounding_box", "bone_name", "slot_name", "attachment_name", "collision_object_2d", "ofs", "scale", "rot"), &Spine::add_bounding_box, Vector2(0, 0), Vector2(1, 1), 0);
-	ObjectTypeDB::bind_method(_MD("remove_bounding_box", "bone_name", "collision_object_2d"), &Spine::remove_bounding_box);
+	ClassDB::bind_method(D_METHOD("get_current_animation"), &Spine::get_current_animation);
+	ClassDB::bind_method(D_METHOD("stop_all"), &Spine::stop_all);
+	ClassDB::bind_method(D_METHOD("reset"), &Spine::reset);
+	ClassDB::bind_method(D_METHOD("seek", "pos"), &Spine::seek);
+	ClassDB::bind_method(D_METHOD("tell"), &Spine::tell);
+	ClassDB::bind_method(D_METHOD("set_active", "active"), &Spine::set_active);
+	ClassDB::bind_method(D_METHOD("is_active"), &Spine::is_active);
+	ClassDB::bind_method(D_METHOD("get_animation_length", "animation"), &Spine::get_animation_length);
+	ClassDB::bind_method(D_METHOD("set_speed", "speed"), &Spine::set_speed);
+	ClassDB::bind_method(D_METHOD("get_speed"), &Spine::get_speed);
+	ClassDB::bind_method(D_METHOD("set_skip_frames", "frames"), &Spine::set_skip_frames);
+	ClassDB::bind_method(D_METHOD("get_skip_frames"), &Spine::get_skip_frames);
+	ClassDB::bind_method(D_METHOD("set_flip_x", "fliped"), &Spine::set_flip_x);
+	ClassDB::bind_method(D_METHOD("is_flip_x"), &Spine::is_flip_x);
+	ClassDB::bind_method(D_METHOD("set_flip_y", "fliped"), &Spine::set_flip_y);
+	ClassDB::bind_method(D_METHOD("is_flip_y"), &Spine::is_flip_y);
+	ClassDB::bind_method(D_METHOD("set_skin", "skin"), &Spine::set_skin);
+	ClassDB::bind_method(D_METHOD("set_animation_process_mode","mode"),&Spine::set_animation_process_mode);
+	ClassDB::bind_method(D_METHOD("get_animation_process_mode"),&Spine::get_animation_process_mode);
+	ClassDB::bind_method(D_METHOD("get_skeleton"), &Spine::get_skeleton);
+	ClassDB::bind_method(D_METHOD("get_attachment", "slot_name", "attachment_name"), &Spine::get_attachment);
+	ClassDB::bind_method(D_METHOD("get_bone", "bone_name"), &Spine::get_bone);
+	ClassDB::bind_method(D_METHOD("get_slot", "slot_name"), &Spine::get_slot);
+	ClassDB::bind_method(D_METHOD("set_attachment", "slot_name", "attachment"), &Spine::set_attachment);
+	ClassDB::bind_method(D_METHOD("has_attachment_node", "bone_name", "node"), &Spine::has_attachment_node);
+	ClassDB::bind_method(D_METHOD("add_attachment_node", "bone_name", "node", "ofs", "scale", "rot"), &Spine::add_attachment_node, Vector2(0, 0), Vector2(1, 1), 0);
+	ClassDB::bind_method(D_METHOD("remove_attachment_node", "p_bone_name", "node"), &Spine::remove_attachment_node);
+	ClassDB::bind_method(D_METHOD("get_bounding_box", "slot_name", "attachment_name"), &Spine::get_bounding_box);
+	ClassDB::bind_method(D_METHOD("add_bounding_box", "bone_name", "slot_name", "attachment_name", "collision_object_2d", "ofs", "scale", "rot"), &Spine::add_bounding_box, Vector2(0, 0), Vector2(1, 1), 0);
+	ClassDB::bind_method(D_METHOD("remove_bounding_box", "bone_name", "collision_object_2d"), &Spine::remove_bounding_box);
 
-	ObjectTypeDB::bind_method(_MD("set_fx_slot_prefix", "prefix"), &Spine::set_fx_slot_prefix);
-	ObjectTypeDB::bind_method(_MD("get_fx_slot_prefix"), &Spine::get_fx_slot_prefix);
-	
-	ObjectTypeDB::bind_method(_MD("set_debug_bones", "enable"), &Spine::set_debug_bones);
-	ObjectTypeDB::bind_method(_MD("is_debug_bones"), &Spine::is_debug_bones);
-	ObjectTypeDB::bind_method(_MD("set_debug_attachment", "mode", "enable"), &Spine::set_debug_attachment);
-	ObjectTypeDB::bind_method(_MD("is_debug_attachment", "mode"), &Spine::is_debug_attachment);
+	ClassDB::bind_method(D_METHOD("set_fx_slot_prefix", "prefix"), &Spine::set_fx_slot_prefix);
+	ClassDB::bind_method(D_METHOD("get_fx_slot_prefix"), &Spine::get_fx_slot_prefix);
 
-	ObjectTypeDB::bind_method(_MD("_on_fx_draw"), &Spine::_on_fx_draw);
+	ClassDB::bind_method(D_METHOD("set_debug_bones", "enable"), &Spine::set_debug_bones);
+	ClassDB::bind_method(D_METHOD("is_debug_bones"), &Spine::is_debug_bones);
+	ClassDB::bind_method(D_METHOD("set_debug_attachment", "mode", "enable"), &Spine::set_debug_attachment);
+	ClassDB::bind_method(D_METHOD("is_debug_attachment", "mode"), &Spine::is_debug_attachment);
 
-	ADD_PROPERTY( PropertyInfo( Variant::INT, "playback/process_mode", PROPERTY_HINT_ENUM, "Fixed,Idle"), _SCS("set_animation_process_mode"), _SCS("get_animation_process_mode"));
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "playback/speed", PROPERTY_HINT_RANGE, "-64,64,0.01"), _SCS("set_speed"), _SCS("get_speed"));
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "playback/active"), _SCS("set_active"), _SCS("is_active"));
-	//ADD_PROPERTY(PropertyInfo(Variant::REAL, "playback/pos", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR), _SCS("seek"), _SCS("tell"));
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "playback/skip_frames", PROPERTY_HINT_RANGE, "0,10,1"), _SCS("set_skip_frames"), _SCS("get_skip_frames"));
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug/bones"), _SCS("set_debug_bones"), _SCS("is_debug_bones"));
+	ClassDB::bind_method(D_METHOD("_on_fx_draw"), &Spine::_on_fx_draw);
 
-	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "modulate"), _SCS("set_modulate"), _SCS("get_modulate"));
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_x"), _SCS("set_flip_x"), _SCS("is_flip_x"));
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_y"), _SCS("set_flip_y"), _SCS("is_flip_y"));
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "fx_prefix"), _SCS("set_fx_slot_prefix"), _SCS("get_fx_slot_prefix"));
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "resource", PROPERTY_HINT_RESOURCE_TYPE, "SpineResource"), _SCS("set_resource"), _SCS("get_resource")); //, PROPERTY_USAGE_NOEDITOR));
-	
+	ADD_PROPERTY(PropertyInfo( Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Fixed,Idle"), "set_animation_process_mode", "get_animation_process_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "speed", PROPERTY_HINT_RANGE, "-64,64,0.01"), "set_speed", "get_speed");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "active"), "set_active", "is_active");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "skip_frames", PROPERTY_HINT_RANGE, "0, 100, 1"), "set_skip_frames", "get_skip_frames");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_bones"), "set_debug_bones", "is_debug_bones");
+
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_x"), "set_flip_x", "is_flip_x");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_y"), "set_flip_y", "is_flip_y");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "fx_prefix"), "set_fx_slot_prefix", "get_fx_slot_prefix");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "resource", PROPERTY_HINT_RESOURCE_TYPE, "SpineResource"), "set_resource", "get_resource"); //, PROPERTY_USAGE_NOEDITOR));
 
 	ADD_SIGNAL(MethodInfo("animation_start", PropertyInfo(Variant::INT, "track")));
 	ADD_SIGNAL(MethodInfo("animation_complete", PropertyInfo(Variant::INT, "track"), PropertyInfo(Variant::INT, "loop_count")));
@@ -1300,7 +1295,7 @@ void Spine::_update_verties_count() {
 		spSlot* slot = skeleton->drawOrder[i];
 		if (!slot->attachment)
 			continue;
-		
+
 		switch (slot->attachment->type) {
 
 			case SP_ATTACHMENT_MESH:
@@ -1317,7 +1312,7 @@ void Spine::_update_verties_count() {
 		world_verts.resize(verties_count);
 		memset(world_verts.ptr(),0,world_verts.size() * sizeof(float));
 	}
-		
+
 }
 
 Spine::Spine()

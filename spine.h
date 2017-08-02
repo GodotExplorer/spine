@@ -40,7 +40,7 @@ class CollisionObject2D;
 
 class Spine : public Node2D {
 
-	OBJ_TYPE(Spine, Node2D);
+	GDCLASS(Spine, Node2D);
 public:
 	enum AnimationProcessMode {
 		ANIMATION_PROCESS_FIXED,
@@ -55,11 +55,11 @@ public:
 
 	class SpineResource : public Resource {
 
-		OBJ_TYPE(SpineResource, Resource);
-	
+		GDCLASS(SpineResource, Resource);
+
 
 	public:
-		
+
 		SpineResource();
 		~SpineResource();
 
@@ -128,7 +128,7 @@ private:
 
 protected:
 	static Array *invalid_names;
-	
+
 	bool _set(const StringName& p_name, const Variant& p_value);
 	bool _get(const StringName& p_name, Variant &r_ret) const;
 	void _get_property_list(List<PropertyInfo> *p_list) const;
@@ -145,7 +145,7 @@ public:
 
 	Array get_animation_names() const;
 
-	bool has(const String& p_name);
+	bool has_animation(const String& p_name);
 	void mix(const String& p_from, const String& p_to, real_t p_duration);
 
 	bool play(const String& p_name, real_t p_cunstom_scale = 1.0f, bool p_loop = false, int p_track = 0, int p_delay = 0);
@@ -226,7 +226,7 @@ public:
 	//void advance(float p_time);
 
 	virtual Rect2 get_item_rect() const;
-	
+
 	Spine();
 	virtual ~Spine();
 };

@@ -1,3 +1,5 @@
 *.o
+*.obj
+*.lib
 *.d
 *.pyc
