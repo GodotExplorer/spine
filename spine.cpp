@@ -398,9 +398,9 @@ void Spine::_animation_process(float p_delta) {
 			continue;
 		}
 		spBone *bone = info.bone;
-		node->call("set_pos", Vector2(bone->worldX + bone->skeleton->x, -bone->worldY + bone->skeleton->y) + info.ofs);
+		node->call("set_position", Vector2(bone->worldX + bone->skeleton->x, -bone->worldY + bone->skeleton->y) + info.ofs);
 		node->call("set_scale", Vector2(spBone_getWorldScaleX(bone), spBone_getWorldScaleY(bone)) * info.scale);
-		node->call("set_rot", Math::atan2(bone->c, bone->d) + Math::deg2rad(info.rot));
+		node->call("set_rotation", Math::atan2(bone->c, bone->d) + Math::deg2rad(info.rot));
 	}
 	update();
 	process_delta = 0;
