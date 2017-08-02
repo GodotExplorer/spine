@@ -1,4 +1,5 @@
-This module add [Spine](http://esotericsoftware.com/) animation support for godot game engie 2.x. It was tested with godot 2.1.
+This module add [Spine](http://esotericsoftware.com/) animation support for godot game engie 3.0. It was tested with godot 3.0 alpha1.
+The 2.1 module is also avaiable in the [2.1 branch](https://github.com/GodotExplorer/spine/tree/2.1)
 
 Current useing the spine runtime version **3.5.51**.
 
