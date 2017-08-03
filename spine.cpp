@@ -122,18 +122,16 @@ void Spine::_spine_dispose() {
 
 static Ref<Texture> spine_get_texture(spRegionAttachment* attachment) {
 
-	Ref<Texture> *ref = static_cast<Ref<Texture> *>(
-		((spAtlasRegion*)attachment->rendererObject)->page->rendererObject
-	);
-	return *ref;
+	if(Ref<Texture> *ref = static_cast<Ref<Texture> *>(((spAtlasRegion*)attachment->rendererObject)->page->rendererObject))
+		return *ref;
+	return NULL;
 }
 
 static Ref<Texture> spine_get_texture(spMeshAttachment* attachment) {
 
-	Ref<Texture> *ref = static_cast<Ref<Texture> *>(
-		((spAtlasRegion*)attachment->rendererObject)->page->rendererObject
-		);
-	return *ref;
+	if(Ref<Texture> *ref = static_cast<Ref<Texture> *>(((spAtlasRegion*)attachment->rendererObject)->page->rendererObject))
+		return *ref;
+	return NULL;
 }
 
 void Spine::_on_fx_draw() {

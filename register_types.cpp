@@ -55,8 +55,8 @@ void _spAtlasPage_createTexture(spAtlasPage* self, const char* path) {
 
 void _spAtlasPage_disposeTexture(spAtlasPage* self) {
 
-	TextureRef *ref = static_cast<TextureRef *>(self->rendererObject);
-	memdelete(ref);
+	if(TextureRef *ref = static_cast<TextureRef *>(self->rendererObject))
+		memdelete(ref);
 }
 
 
