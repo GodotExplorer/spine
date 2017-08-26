@@ -32,7 +32,7 @@
 #include "scene/2d/collision_object_2d.h"
 #include "scene/resources/convex_polygon_shape_2d.h"
 #include <core/method_bind_ext.gen.inc>
-
+#include <core/engine.h>
 #include "spine.h"
 #include <spine/spine.h>
 #include <spine/extension.h>
@@ -385,7 +385,7 @@ void Spine::_animation_process(float p_delta) {
 		AttachmentNode& info = E->get();
 		WeakRef *ref = info.ref;
 		Object *obj = ref->get_ref();
-		Node2D *node = (obj != NULL) ? obj->cast_to<Node2D>() : NULL;
+		Node2D *node = (obj != NULL) ? Object::cast_to<Node2D>(obj) : NULL;
 		if (obj == NULL || node == NULL) {
 
 			AttachmentNodes::Element *NEXT = E->next();
@@ -576,7 +576,7 @@ void Spine::_notification(int p_what) {
 		fx_node->set_z_as_relative(false);
 		add_child(fx_node);
 
-		if (!get_tree()->is_editor_hint() && has_animation(autoplay)) {
+		if (!Engine::get_singleton()->is_editor_hint() && has_animation(autoplay)) {
 			play(autoplay);
 		}
 	} break;
@@ -992,7 +992,7 @@ bool Spine::add_attachment_node(const String& p_bone_name, const Variant& p_node
 	ERR_FAIL_COND_V(bone == NULL, false);
 	Object *obj = p_node;
 	ERR_FAIL_COND_V(obj == NULL, false);
-	Node2D *node = obj->cast_to<Node2D>();
+	Node2D *node = Object::cast_to<Node2D>(obj);
 	ERR_FAIL_COND_V(node == NULL, false);
 
 	if (obj->has_meta("spine_meta")) {
@@ -1030,7 +1030,7 @@ bool Spine::remove_attachment_node(const String& p_bone_name, const Variant& p_n
 	ERR_FAIL_COND_V(bone == NULL, false);
 	Object *obj = p_node;
 	ERR_FAIL_COND_V(obj == NULL, false);
-	Node2D *node = obj->cast_to<Node2D>();
+	Node2D *node = Object::cast_to<Node2D>(obj);
 	ERR_FAIL_COND_V(node == NULL, false);
 
 	if (!obj->has_meta("spine_meta"))
@@ -1069,7 +1069,7 @@ bool Spine::add_bounding_box(const String& p_bone_name, const String& p_slot_nam
 	ERR_FAIL_COND_V(skeleton == NULL, false);
 	Object *obj = p_node;
 	ERR_FAIL_COND_V(obj == NULL, false);
-	CollisionObject2D *node = obj->cast_to<CollisionObject2D>();
+	CollisionObject2D *node = Object::cast_to<CollisionObject2D>(obj);
 	ERR_FAIL_COND_V(node == NULL, false);
 	Ref<Shape2D> shape = get_bounding_box(p_slot_name, p_attachment_name);
 	if (shape.is_null())
