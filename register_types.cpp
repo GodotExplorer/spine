@@ -61,15 +61,17 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self) {
 
 
 char* _spUtil_readFile(const char* p_path, int* p_length) {
+
+	String str_path = String::utf8(p_path);
 	FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
 	ERR_FAIL_COND_V(!f, NULL);
 
-	String str_path = String::utf8(p_path);
+	*p_length = f->get_len();
 
 	char *data = (char *)_malloc(*p_length, __FILE__, __LINE__);
-	*p_length = f->get_len();
 	data = (char *)_malloc(*p_length, __FILE__, __LINE__);
 	ERR_FAIL_COND_V(data == NULL, NULL);
+
 	f->get_buffer((uint8_t *)data, *p_length);
 
 	/*
@@ -193,7 +195,7 @@ public:
 
 		res->set_path(p_path);
 		float finish = OS::get_singleton()->get_ticks_msec();
-		print_line("Spine resource (" + p_path + ") loaded in " + itos(finish-start) + " msecs");
+		// print_line("Spine resource (" + p_path + ") loaded in " + itos(finish-start) + " msecs");
 		return ref;
 	}
 
