@@ -406,7 +406,7 @@ void Spine::_set_process(bool p_process, bool p_force) {
 
 	switch (animation_process_mode) {
 
-		case ANIMATION_PROCESS_FIXED: set_fixed_process(p_process && active); break;
+		case ANIMATION_PROCESS_FIXED: set_physics_process(p_process && active); break;
 		case ANIMATION_PROCESS_IDLE: set_process(p_process && active); break;
 	}
 
@@ -553,7 +553,7 @@ void Spine::_notification(int p_what) {
 			if (!processing) {
 				//make sure that a previous process state was not saved
 				//only process if "processing" is set
-				set_fixed_process(false);
+				set_physics_process(false);
 				set_process(false);
 			}
 		} break;
@@ -576,13 +576,13 @@ void Spine::_notification(int p_what) {
 			if (processing)
 				_animation_process(get_process_delta_time());
 		} break;
-		case NOTIFICATION_FIXED_PROCESS: {
+		case NOTIFICATION_PHYSICS_PROCESS: {
 
 			if (animation_process_mode == ANIMATION_PROCESS_IDLE)
 				break;
 
 			if (processing)
-				_animation_process(get_fixed_process_delta_time());
+				_animation_process(get_physics_process_delta_time());
 		} break;
 
 		case NOTIFICATION_DRAW: {
