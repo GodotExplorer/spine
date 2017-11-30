@@ -65,19 +65,19 @@ void SpineBatcher::Elements::draw(RID ci) {
 
 	Vector<int> p_indices;
 	p_indices.resize(indies_count);
-	memcpy(p_indices.ptr(), indies, indies_count * sizeof(int) );
+	memcpy(p_indices.ptrw(), indies, indies_count * sizeof(int) );
 
 	Vector<Vector2> p_points;
 	p_points.resize(vertices_count);
-	memcpy(p_points.ptr(), vertices, vertices_count * sizeof(Vector2));
+	memcpy(p_points.ptrw(), vertices, vertices_count * sizeof(Vector2));
 
 	Vector<Color> p_colors;
 	p_colors.resize(vertices_count);
-	memcpy(p_colors.ptr(), colors, vertices_count * sizeof(Color));
+	memcpy(p_colors.ptrw(), colors, vertices_count * sizeof(Color));
 
 	Vector<Vector2> p_uvs;
 	p_uvs.resize(vertices_count);
-	memcpy(p_uvs.ptr(), uvs, vertices_count * sizeof(Vector2));
+	memcpy(p_uvs.ptrw(), uvs, vertices_count * sizeof(Vector2));
 
 	VisualServer::get_singleton()->canvas_item_add_triangle_array(ci,
 		p_indices,
