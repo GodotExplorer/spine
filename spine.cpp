@@ -179,7 +179,7 @@ void Spine::_animation_draw() {
 
 				spRegionAttachment *attachment = (spRegionAttachment *)slot->attachment;
 				is_fx = strstr(attachment->path, fx_prefix) != NULL;
-				spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptr());
+				spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptrw());
 				texture = spine_get_texture(attachment);
 				uvs = attachment->uvs;
 				verties_count = 8;
@@ -196,7 +196,7 @@ void Spine::_animation_draw() {
 
 				spMeshAttachment *attachment = (spMeshAttachment *)slot->attachment;
 				is_fx = strstr(attachment->path, fx_prefix) != NULL;
-				spMeshAttachment_computeWorldVertices(attachment, slot, world_verts.ptr());
+				spMeshAttachment_computeWorldVertices(attachment, slot, world_verts.ptrw());
 				texture = spine_get_texture(attachment);
 				uvs = attachment->uvs;
 				verties_count = ((spVertexAttachment *)attachment)->worldVerticesLength;
@@ -264,7 +264,7 @@ void Spine::_animation_draw() {
 						continue;
 					spRegionAttachment *attachment = (spRegionAttachment *)slot->attachment;
 					verties_count = 8;
-					spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptr());
+					spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptrw());
 					color = Color(0, 0, 1, 1);
 					triangles = NULL;
 					triangles_count = 0;
@@ -275,7 +275,7 @@ void Spine::_animation_draw() {
 					if (!debug_attachment_mesh)
 						continue;
 					spMeshAttachment *attachment = (spMeshAttachment *)slot->attachment;
-					spMeshAttachment_computeWorldVertices(attachment, slot, world_verts.ptr());
+					spMeshAttachment_computeWorldVertices(attachment, slot, world_verts.ptrw());
 					verties_count = ((spVertexAttachment *)attachment)->verticesCount;
 					color = Color(0, 1, 1, 1);
 					triangles = attachment->triangles;
@@ -287,7 +287,7 @@ void Spine::_animation_draw() {
 					if (!debug_attachment_bounding_box)
 						continue;
 					spBoundingBoxAttachment *attachment = (spBoundingBoxAttachment *)slot->attachment;
-					spBoundingBoxAttachment_computeWorldVertices(attachment, slot, world_verts.ptr());
+					spBoundingBoxAttachment_computeWorldVertices(attachment, slot, world_verts.ptrw());
 					verties_count = ((spVertexAttachment *)attachment)->verticesCount;
 					color = Color(0, 1, 0, 1);
 					triangles = NULL;
@@ -1245,11 +1245,11 @@ Rect2 Spine::_edit_get_rect() const {
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment *attachment = (spRegionAttachment *)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptr());
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, world_verts.ptrw());
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment *mesh = (spMeshAttachment *)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot, world_verts.ptr());
+			spMeshAttachment_computeWorldVertices(mesh, slot, world_verts.ptrw());
 			verticesCount = ((spVertexAttachment *)mesh)->worldVerticesLength;
 		} else
 			continue;
@@ -1294,7 +1294,7 @@ void Spine::_update_verties_count() {
 
 	if (verties_count > world_verts.size()) {
 		world_verts.resize(verties_count);
-		memset(world_verts.ptr(), 0, world_verts.size() * sizeof(float));
+		memset(world_verts.ptrw(), 0, world_verts.size() * sizeof(float));
 	}
 }
 
@@ -1306,7 +1306,7 @@ Spine::Spine()
 	state = NULL;
 	res = RES();
 	world_verts.resize(1000); // Max number of vertices per mesh.
-	memset(world_verts.ptr(), 0, world_verts.size() * sizeof(float));
+	memset(world_verts.ptrw(), 0, world_verts.size() * sizeof(float));
 	speed_scale = 1;
 	autoplay = "";
 	animation_process_mode = ANIMATION_PROCESS_IDLE;
