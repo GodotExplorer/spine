@@ -655,6 +655,12 @@ bool Spine::has_animation(const String &p_name) {
 	return animation != NULL;
 }
 
+void Spine::set_default_mix(real_t p_duration) {
+
+	ERR_FAIL_COND(state == NULL);
+	state->data->defaultMix = p_duration;
+}
+
 void Spine::mix(const String &p_from, const String &p_to, real_t p_duration) {
 
 	ERR_FAIL_COND(state == NULL);
@@ -1158,6 +1164,7 @@ void Spine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_animation_names"), &Spine::get_animation_names);
 	ClassDB::bind_method(D_METHOD("has_animation", "name"), &Spine::has_animation);
 
+	ClassDB::bind_method(D_METHOD("set_default_mix", "duration"), &Spine::set_default_mix);
 	ClassDB::bind_method(D_METHOD("mix", "from", "to", "duration"), &Spine::mix, 0);
 	ClassDB::bind_method(D_METHOD("play", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
 	ClassDB::bind_method(D_METHOD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
