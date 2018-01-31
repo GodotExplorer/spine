@@ -561,7 +561,7 @@ void Spine::_notification(int p_what) {
 
 			// add fx node as child
 			fx_node->connect("draw", this, "_on_fx_draw");
-			fx_node->set_z(1);
+			fx_node->set_z_index(1);
 			fx_node->set_z_as_relative(false);
 			add_child(fx_node);
 
