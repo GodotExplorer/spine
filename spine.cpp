@@ -658,6 +658,7 @@ bool Spine::has_animation(const String &p_name) {
 void Spine::set_default_mix(real_t p_duration) {
 
 	ERR_FAIL_COND(state == NULL);
+	ERR_FAIL_COND(p_duration <= 0.0f);
 	state->data->defaultMix = p_duration;
 }
 
