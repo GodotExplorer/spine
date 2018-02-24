@@ -47,10 +47,8 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 
 spMeshAttachment* spMeshAttachment_create (const char* name) {
 	spMeshAttachment* self = NEW(spMeshAttachment);
-	self->r = 1;
-	self->g = 1;
-	self->b = 1;
-	self->a = 1;
+	_spVertexAttachment_init(SUPER(self));
+	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
 	return self;
 }
@@ -72,10 +70,6 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 			self->uvs[i + 1] = self->regionV + self->regionUVs[i + 1] * height;
 		}
 	}
-}
-
-void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot, float* worldVertices) {
-	spVertexAttachment_computeWorldVertices(SUPER(self), slot, worldVertices);
 }
 
 void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
