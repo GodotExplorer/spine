@@ -160,7 +160,7 @@ public:
 	bool is_forward() const;
 	void set_skip_frames(int p_skip_frames);
 	int get_skip_frames() const;
-	String get_current_animation(int p_track = 0) const;
+	String get_current_animation(int p_track);
 	void stop_all();
 	void reset();
 	void seek(float p_pos);

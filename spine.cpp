@@ -741,7 +741,7 @@ int Spine::get_skip_frames() const {
 	return skip_frames;
 }
 
-String Spine::get_current_animation(int p_track) const {
+String Spine::get_current_animation(int p_track = 0) {
 
 	ERR_FAIL_COND_V(state == NULL, "");
 	spTrackEntry *entry = spAnimationState_getCurrent(state, p_track);
@@ -1171,7 +1171,7 @@ void Spine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("stop"), &Spine::stop);
 	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing);
 
-	ClassDB::bind_method(D_METHOD("get_current_animation"), &Spine::get_current_animation);
+	ClassDB::bind_method(D_METHOD("get_current_animation", "p_track"), &Spine::get_current_animation, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("stop_all"), &Spine::stop_all);
 	ClassDB::bind_method(D_METHOD("reset"), &Spine::reset);
 	ClassDB::bind_method(D_METHOD("seek", "pos"), &Spine::seek);
