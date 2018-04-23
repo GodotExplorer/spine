@@ -666,7 +666,7 @@ void Spine::mix(const String &p_from, const String &p_to, real_t p_duration) {
 	spAnimationStateData_setMixByName(state->data, p_from.utf8().get_data(), p_to.utf8().get_data(), p_duration);
 }
 
-bool Spine::play(const String &p_name, real_t p_cunstom_scale, bool p_loop, int p_track, int p_delay) {
+bool Spine::play(const String &p_name, bool p_loop, int p_track, int p_delay) {
 
 	ERR_FAIL_COND_V(skeleton == NULL, false);
 	spAnimation *animation = spSkeletonData_findAnimation(skeleton->data, p_name.utf8().get_data());
@@ -687,7 +687,7 @@ bool Spine::play(const String &p_name, real_t p_cunstom_scale, bool p_loop, int 
 	return true;
 }
 
-bool Spine::add(const String &p_name, real_t p_cunstom_scale, bool p_loop, int p_track, int p_delay) {
+bool Spine::add(const String &p_name, bool p_loop, int p_track, int p_delay) {
 
 	ERR_FAIL_COND_V(skeleton == NULL, false);
 	spAnimation *animation = spSkeletonData_findAnimation(skeleton->data, p_name.utf8().get_data());
@@ -1165,8 +1165,8 @@ void Spine::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_default_mix", "duration"), &Spine::set_default_mix);
 	ClassDB::bind_method(D_METHOD("mix", "from", "to", "duration"), &Spine::mix, 0);
-	ClassDB::bind_method(D_METHOD("play", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
-	ClassDB::bind_method(D_METHOD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("play", "name", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("add", "name", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
 	ClassDB::bind_method(D_METHOD("clear", "track"), &Spine::clear);
 	ClassDB::bind_method(D_METHOD("stop"), &Spine::stop);
 	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing, DEFVAL(0));
