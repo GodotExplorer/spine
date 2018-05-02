@@ -1169,7 +1169,7 @@ void Spine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
 	ClassDB::bind_method(D_METHOD("clear", "track"), &Spine::clear);
 	ClassDB::bind_method(D_METHOD("stop"), &Spine::stop);
-	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing);
+	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing, DEFVAL(0));
 
 	ClassDB::bind_method(D_METHOD("get_current_animation", "p_track"), &Spine::get_current_animation, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("stop_all"), &Spine::stop_all);
