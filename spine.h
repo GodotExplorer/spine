@@ -150,8 +150,8 @@ public:
 	void set_default_mix(real_t p_duration);
 	void mix(const String& p_from, const String& p_to, real_t p_duration);
 
-	bool play(const String& p_name, real_t p_cunstom_scale = 1.0f, bool p_loop = false, int p_track = 0, int p_delay = 0);
-	bool add(const String& p_name, real_t p_cunstom_scale = 1.0f, bool p_loop = false, int p_track = 0, int p_delay = 0);
+	bool play(const String& p_name, bool p_loop = false, int p_track = 0, int p_delay = 0);
+	bool add(const String& p_name, bool p_loop = false, int p_track = 0, int p_delay = 0);
 	void clear(int p_track = -1);
 	void stop();
 	bool is_playing(int p_track = 0) const;
@@ -160,7 +160,7 @@ public:
 	bool is_forward() const;
 	void set_skip_frames(int p_skip_frames);
 	int get_skip_frames() const;
-	String get_current_animation(int p_track = 0) const;
+	String get_current_animation(int p_track);
 	void stop_all();
 	void reset();
 	void seek(float p_pos);

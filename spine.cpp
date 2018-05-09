@@ -666,7 +666,7 @@ void Spine::mix(const String &p_from, const String &p_to, real_t p_duration) {
 	spAnimationStateData_setMixByName(state->data, p_from.utf8().get_data(), p_to.utf8().get_data(), p_duration);
 }
 
-bool Spine::play(const String &p_name, real_t p_cunstom_scale, bool p_loop, int p_track, int p_delay) {
+bool Spine::play(const String &p_name, bool p_loop, int p_track, int p_delay) {
 
 	ERR_FAIL_COND_V(skeleton == NULL, false);
 	spAnimation *animation = spSkeletonData_findAnimation(skeleton->data, p_name.utf8().get_data());
@@ -687,7 +687,7 @@ bool Spine::play(const String &p_name, real_t p_cunstom_scale, bool p_loop, int 
 	return true;
 }
 
-bool Spine::add(const String &p_name, real_t p_cunstom_scale, bool p_loop, int p_track, int p_delay) {
+bool Spine::add(const String &p_name, bool p_loop, int p_track, int p_delay) {
 
 	ERR_FAIL_COND_V(skeleton == NULL, false);
 	spAnimation *animation = spSkeletonData_findAnimation(skeleton->data, p_name.utf8().get_data());
@@ -741,7 +741,7 @@ int Spine::get_skip_frames() const {
 	return skip_frames;
 }
 
-String Spine::get_current_animation(int p_track) const {
+String Spine::get_current_animation(int p_track = 0) {
 
 	ERR_FAIL_COND_V(state == NULL, "");
 	spTrackEntry *entry = spAnimationState_getCurrent(state, p_track);
@@ -1165,13 +1165,13 @@ void Spine::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_default_mix", "duration"), &Spine::set_default_mix);
 	ClassDB::bind_method(D_METHOD("mix", "from", "to", "duration"), &Spine::mix, 0);
-	ClassDB::bind_method(D_METHOD("play", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
-	ClassDB::bind_method(D_METHOD("add", "name", "cunstom_scale", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("play", "name", "loop", "track", "delay"), &Spine::play, 1.0f, false, 0, 0);
+	ClassDB::bind_method(D_METHOD("add", "name", "loop", "track", "delay"), &Spine::add, 1.0f, false, 0, 0);
 	ClassDB::bind_method(D_METHOD("clear", "track"), &Spine::clear);
 	ClassDB::bind_method(D_METHOD("stop"), &Spine::stop);
-	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing);
+	ClassDB::bind_method(D_METHOD("is_playing", "track"), &Spine::is_playing, DEFVAL(0));
 
-	ClassDB::bind_method(D_METHOD("get_current_animation"), &Spine::get_current_animation);
+	ClassDB::bind_method(D_METHOD("get_current_animation", "p_track"), &Spine::get_current_animation, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("stop_all"), &Spine::stop_all);
 	ClassDB::bind_method(D_METHOD("reset"), &Spine::reset);
 	ClassDB::bind_method(D_METHOD("seek", "pos"), &Spine::seek);
