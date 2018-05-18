@@ -85,6 +85,8 @@ void SpineBatcher::Elements::draw(RID ci) {
 		p_points,
 		p_colors,
 		p_uvs,
+		Vector<int>(),
+		Vector<float>(),
 		texture->get_rid()
 	);
 
