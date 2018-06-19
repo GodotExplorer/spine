@@ -92,6 +92,8 @@ private:
 	bool debug_attachment_skinned_mesh;
 	bool debug_attachment_bounding_box;
 	String current_animation;
+	float duration; // Handled as a property, but never set in the setter
+	float actual_duration; // Store the actual length of the animation
 	bool loop;
 	String skin;
 
@@ -182,6 +184,9 @@ public:
 	void set_flip_y(bool p_flip);
 	bool is_flip_x() const;
 	bool is_flip_y() const;
+
+	void set_duration(float p_duration);
+	float get_duration() const;
 
 	void set_animation_process_mode(AnimationProcessMode p_mode);
 	AnimationProcessMode get_animation_process_mode() const;
