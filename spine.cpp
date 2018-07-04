@@ -428,6 +428,13 @@ bool Spine::_set(const StringName &p_name, const Variant &p_value) {
 			}
 		} else
 			current_animation = which;
+
+		if (current_animation == "[stop]")
+			actual_duration = 0.0;
+		else
+			actual_duration = get_animation_length(current_animation);
+		// Call this immediately to make the duration visible
+		set_duration(actual_duration);
 	} else if (name == "playback/loop") {
 
 		loop = p_value;
@@ -496,7 +503,6 @@ void Spine::_get_property_list(List<PropertyInfo> *p_list) const {
 	if (state != NULL) {
 
 		for (int i = 0; i < state->data->skeletonData->animationsCount; i++) {
-
 			names.push_back(state->data->skeletonData->animations[i]->name);
 		}
 	}
@@ -850,6 +856,17 @@ bool Spine::set_skin(const String &p_name) {
 	return spSkeleton_setSkinByName(skeleton, p_name.utf8().get_data()) ? true : false;
 }
 
+void Spine::set_duration(float p_duration) {
+	// Ignore p_duration, because it can't actually be affected and this should be read-only
+	duration = actual_duration;
+	update();
+	_change_notify("playback/duration");
+}
+
+float Spine::get_duration() const {
+	return duration;
+}
+
 Dictionary Spine::get_skeleton() const {
 
 	ERR_FAIL_COND_V(skeleton == NULL, Variant());
@@ -1188,6 +1205,8 @@ void Spine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_flip_y", "fliped"), &Spine::set_flip_y);
 	ClassDB::bind_method(D_METHOD("is_flip_y"), &Spine::is_flip_y);
 	ClassDB::bind_method(D_METHOD("set_skin", "skin"), &Spine::set_skin);
+	ClassDB::bind_method(D_METHOD("set_duration", "p_duration"), &Spine::set_duration);
+	ClassDB::bind_method(D_METHOD("get_duration"), &Spine::get_duration);
 	ClassDB::bind_method(D_METHOD("set_animation_process_mode", "mode"), &Spine::set_animation_process_mode);
 	ClassDB::bind_method(D_METHOD("get_animation_process_mode"), &Spine::get_animation_process_mode);
 	ClassDB::bind_method(D_METHOD("get_skeleton"), &Spine::get_skeleton);
@@ -1222,6 +1241,8 @@ void Spine::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_y"), "set_flip_y", "is_flip_y");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "fx_prefix"), "set_fx_slot_prefix", "get_fx_slot_prefix");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "resource", PROPERTY_HINT_RESOURCE_TYPE, "SpineResource"), "set_resource", "get_resource"); //, PROPERTY_USAGE_NOEDITOR));
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "playback/duration", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_EDITOR), "set_duration", "get_duration");
+
 
 	ADD_SIGNAL(MethodInfo("animation_start", PropertyInfo(Variant::INT, "track")));
 	ADD_SIGNAL(MethodInfo("animation_complete", PropertyInfo(Variant::INT, "track"), PropertyInfo(Variant::INT, "loop_count")));
@@ -1332,6 +1353,8 @@ Spine::Spine()
 
 	skin = "";
 	current_animation = "[stop]";
+	duration = 0.0;
+	actual_duration = 0.0;
 	loop = true;
 	fx_slot_prefix = String("fx/").utf8();
 
