@@ -1338,7 +1338,7 @@ Spine::Spine()
 	autoplay = "";
 	animation_process_mode = ANIMATION_PROCESS_IDLE;
 	processing = false;
-	active = false;
+	active = true;
 	playing = false;
 	forward = true;
 	process_delta = 0;
