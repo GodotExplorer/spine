@@ -188,16 +188,16 @@ public:
 			json->scale = 1;
 
 			res->data = spSkeletonJson_readSkeletonDataFile(json, p_path.utf8().get_data());
-			ERR_EXPLAIN(json->error ? json->error : "");
 			spSkeletonJson_dispose(json);
+			ERR_EXPLAIN(json->error);
 			ERR_FAIL_COND_V(res->data == NULL, RES());
 		} else {
 			spSkeletonBinary* bin  = spSkeletonBinary_create(res->atlas);
 			ERR_FAIL_COND_V(bin == NULL, RES());
 			bin->scale = 1;
 			res->data = spSkeletonBinary_readSkeletonDataFile(bin, p_path.utf8().get_data());
-			ERR_EXPLAIN(bin->error ? bin->error : "");
 			spSkeletonBinary_dispose(bin);
+			ERR_EXPLAIN(bin->error);
 			ERR_FAIL_COND_V(res->data == NULL, RES());
 		}
 
