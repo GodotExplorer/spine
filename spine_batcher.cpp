@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 #ifdef MODULE_SPINE_ENABLED
+#include "core/version_generated.gen.h"
 #include "spine_batcher.h"
 
 #define BATCH_CAPACITY 1024

@@ -1066,7 +1066,7 @@ Ref<Shape2D> Spine::get_bounding_box(const String &p_slot_name, const String &p_
 	Vector<Vector2> points;
 	points.resize(info->verticesCount / 2);
 	for (int idx = 0; idx < info->verticesCount / 2; idx++)
-		points[idx] = Vector2(info->vertices[idx * 2], -info->vertices[idx * 2 + 1]);
+		points.write[idx] = Vector2(info->vertices[idx * 2], -info->vertices[idx * 2 + 1]);
 
 	ConvexPolygonShape2D *shape = memnew(ConvexPolygonShape2D);
 	shape->set_points(points);
