@@ -28,11 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 #ifdef MODULE_SPINE_ENABLED
-
 #include "spine.h"
 #include "core/io/resource_loader.h"
 #include "scene/2d/collision_object_2d.h"
 #include "scene/resources/convex_polygon_shape_2d.h"
+#include "core/version.h"
 #include <core/engine.h>
 #include <spine/extension.h>
 #include <spine/spine.h>
