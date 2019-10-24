@@ -398,6 +398,8 @@ void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 		CONST_CAST(float, bone->ascaleY) = bone->scaleY;
 		CONST_CAST(float, bone->ashearX) = bone->shearX;
 		CONST_CAST(float, bone->ashearY) = bone->shearY;
+		//CONST_CAST(int, bone->aflipX) = 0;
+		//CONST_CAST(int, bone->aflipY) = 0;
 		CONST_CAST(int, bone->appliedValid) = 1;
 	}
 
@@ -405,7 +407,7 @@ void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 		_spUpdate* update = internal->updateCache + i;
 		switch (update->type) {
 		case SP_UPDATE_BONE:
-			spBone_updateWorldTransform((spBone*)update->object);
+			spBone_updateWorldTransform((spBone*)update->object, 0);
 			break;
 		case SP_UPDATE_IK_CONSTRAINT:
 			spIkConstraint_apply((spIkConstraint*)update->object);

@@ -49,6 +49,8 @@ struct spBone {
 	spBone** const children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
+	int /*bool*/ flipX, flipY;
+	int /*bool*/ aflipX, aflipY;
 	int /*bool*/ appliedValid;
 
 	float const a, b, worldX;
@@ -62,8 +64,10 @@ struct spBone {
 		skeleton(0),
 		parent(0),
 		childrenCount(0), children(0),
-		x(0), y(0), rotation(0), scaleX(0), scaleY(0),
+		x(0), y(0), rotation(0), scaleX(0), scaleY(0), shearX(0), shearY(0),
 		ax(0), ay(0), arotation(0), ascaleX(0), ascaleY(0), ashearX(0), ashearY(0),
+		flipX(0), flipY(0),
+		aflipX(0), aflipY(0),
 		appliedValid(0),
 
 		a(0), b(0), worldX(0),
@@ -89,7 +93,7 @@ SP_API void spBone_updateWorldTransformWith (spBone* self, float x, float y, flo
 SP_API float spBone_getWorldRotationX (spBone* self);
 SP_API float spBone_getWorldRotationY (spBone* self);
 SP_API float spBone_getWorldScaleX (spBone* self);
-SP_API float spBone_getWorldScaleY (spBone* self);
+SP_API float spBone_getWorldScaleY(spBone *self);
 
 SP_API void spBone_updateAppliedTransform (spBone* self);
 

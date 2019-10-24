@@ -151,12 +151,15 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* bones = Json_getItem(root, "bones");
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
+	Json* ffd = Json_getItem(root, "ffd");
 	Json* transform = Json_getItem(root, "transform");
 	Json* paths = Json_getItem(root, "paths");
 	Json* deform = Json_getItem(root, "deform");
 	Json* drawOrder = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
-	Json *boneMap, *slotMap, *constraintMap;
+	Json* flipX = Json_getItem(root, "flipx");
+	Json* flipY = Json_getItem(root, "flipy");
+	Json *boneMap, *slotMap, *constraintMap, *ffdMap;
 	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
 
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
@@ -172,9 +175,12 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			timelinesCount += slotMap->size;
 	if (drawOrder) ++timelinesCount;
 	if (events) ++timelinesCount;
+	//if (flipX) ++timelinesCount;
+	//if (flipY) ++timelinesCount;
 
 	animation = spAnimation_create(root->name, timelinesCount);
 	animation->timelinesCount = 0;
+	//skeletonData->animations[skeletonData->animationsCount++] = animation;
 
 	/* Slot timelines. */
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next) {
@@ -278,6 +284,18 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 					animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * TRANSLATE_ENTRIES]);
 
+				} else if (strcmp(timelineMap->name, "flipX") == 0 || strcmp(timelineMap->name, "flipY") == 0) {
+					int x = strcmp(timelineMap->name, "flipX") == 0;
+					const char *field = x ? "x" : "y";
+					spFlipTimeline *timeline = spFlipTimeline_create(timelineMap->size, x);
+					timeline->boneIndex = boneIndex;
+					for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
+						spFlipTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), Json_getInt(valueMap, field, 0));
+						readCurve(valueMap, SUPER(timeline), frameIndex);
+					}
+					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+					animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * FLIP_ENTRIES]);
+					
 				} else {
 					spAnimation_dispose(animation);
 					_spSkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineMap->name);
@@ -608,6 +626,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	for (boneMap = bones->child, i = 0; boneMap; boneMap = boneMap->next, ++i) {
 		spBoneData* data;
 		const char* transformMode;
+		int inheritScale;
+		int inheritRotation;
 
 		spBoneData* parent = 0;
 		const char* parentName = Json_getString(boneMap, "parent", 0);
@@ -629,15 +649,19 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		data->scaleY = Json_getFloat(boneMap, "scaleY", 1);
 		data->shearX = Json_getFloat(boneMap, "shearX", 0);
 		data->shearY = Json_getFloat(boneMap, "shearY", 0);
+		inheritScale = Json_getInt(boneMap, "inheritScale", 1);
+		inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
+		data->flipX = Json_getInt(boneMap, "flipX", 0);
+		data->flipY = Json_getInt(boneMap, "flipY", 0);
 		transformMode = Json_getString(boneMap, "transform", "normal");
 		data->transformMode = SP_TRANSFORMMODE_NORMAL;
-		if (strcmp(transformMode, "normal") == 0)
+		if (strcmp(transformMode, "normal") == 0 || (inheritRotation == 1 && inheritScale == 1))
 			data->transformMode = SP_TRANSFORMMODE_NORMAL;
-		if (strcmp(transformMode, "onlyTranslation") == 0)
+		if (strcmp(transformMode, "onlyTranslation") == 0 || (inheritRotation == 0 && inheritScale == 1))
 			data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION;
-		if (strcmp(transformMode, "noRotationOrReflection") == 0)
+		if (strcmp(transformMode, "noRotationOrReflection") == 0 || (inheritRotation == 0 && inheritScale == 0))
 			data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION;
-		if (strcmp(transformMode, "noScale") == 0)
+		if (strcmp(transformMode, "noScale") == 0 || (inheritRotation == 1 && inheritScale == 0))
 			data->transformMode = SP_TRANSFORMMODE_NOSCALE;
 		if (strcmp(transformMode, "noScaleOrReflection") == 0)
 			data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
@@ -881,7 +905,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					spAttachmentType type;
 					if (strcmp(typeString, "region") == 0)
 						type = SP_ATTACHMENT_REGION;
-					else if (strcmp(typeString, "mesh") == 0)
+					else if (strcmp(typeString, "mesh") == 0 || strcmp(typeString, "skinnedmesh") == 0 || strcmp(typeString, "weightedmesh") == 0)
 						type = SP_ATTACHMENT_MESH;
 					else if (strcmp(typeString, "linkedmesh") == 0)
 						type = SP_ATTACHMENT_LINKED_MESH;

@@ -98,8 +98,11 @@ typedef enum {
 	SP_TIMELINE_DEFORM,
 	SP_TIMELINE_EVENT,
 	SP_TIMELINE_DRAWORDER,
+	SP_TIMELINE_FFD,
 	SP_TIMELINE_IKCONSTRAINT,
 	SP_TIMELINE_TRANSFORMCONSTRAINT,
+	SP_TIMELINE_FLIPX,
+	SP_TIMELINE_FLIPY,
 	SP_TIMELINE_PATHCONSTRAINTPOSITION,
 	SP_TIMELINE_PATHCONSTRAINTSPACING,
 	SP_TIMELINE_PATHCONSTRAINTMIX,
@@ -211,7 +214,7 @@ typedef struct spBaseTimeline spTranslateTimeline;
 
 SP_API spTranslateTimeline* spTranslateTimeline_create (int framesCount);
 
-SP_API void spTranslateTimeline_setFrame (spTranslateTimeline* self, int frameIndex, float time, float x, float y);
+SP_API void spTranslateTimeline_setFrame(spTranslateTimeline *self, int frameIndex, float time, float x, float y);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spTranslateTimeline TranslateTimeline;
@@ -457,6 +460,38 @@ SP_API void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int f
 typedef spIkConstraintTimeline IkConstraintTimeline;
 #define IkConstraintTimeline_create(...) spIkConstraintTimeline_create(__VA_ARGS__)
 #define IkConstraintTimeline_setFrame(...) spIkConstraintTimeline_setFrame(__VA_ARGS__)
+#endif
+
+/**/
+
+typedef struct spFlipTimeline {
+	spTimeline super;
+	int const framesCount;
+	float *const frames; /* time, flip, ... */
+	int boneIndex;
+	int const x;
+
+#ifdef __cplusplus
+	spFlipTimeline() :
+			super(),
+			framesCount(0),
+			frames(0),
+			boneIndex(0),
+			x(0) {
+	}
+#endif
+} spFlipTimeline;
+
+static const int FLIP_ENTRIES = 2;
+
+SP_API spFlipTimeline *spFlipTimeline_create(int framesCount, int /*bool*/ x);
+
+SP_API void spFlipTimeline_setFrame(spFlipTimeline *self, int frameIndex, float time, int /*bool*/ flip);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spFlipTimeline FlipTimeline;
+#define FlipTimeline_create(...) spFlipTimeline_create(__VA_ARGS__)
+#define FlipTimeline_setFrame(...) spFlipTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/

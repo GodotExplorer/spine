@@ -85,11 +85,13 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			x = -x;
 			la = -la;
 			lb = -lb;
+			self->aflipX = 1;
 		}
 		if (self->skeleton->flipY != yDown) {
 			y = -y;
 			lc = -lc;
 			ld = -ld;
+			self->aflipY = 1;
 		}
 		CONST_CAST(float, self->a) = la;
 		CONST_CAST(float, self->b) = lb;
@@ -107,6 +109,9 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 
 	CONST_CAST(float, self->worldX) = pa * x + pb * y + parent->worldX;
 	CONST_CAST(float, self->worldY) = pc * x + pd * y + parent->worldY;
+	//CONST_CAST(int, self->aflipX) = self->parent->aflipX ^ self->flipX;
+	//CONST_CAST(int, self->aflipX) = self->parent->aflipY ^ self->flipY;
+
 
 	switch (self->data->transformMode) {
 		case SP_TRANSFORMMODE_NORMAL: {
@@ -119,7 +124,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			CONST_CAST(float, self->b) = pa * lb + pb * ld;
 			CONST_CAST(float, self->c) = pc * la + pd * lc;
 			CONST_CAST(float, self->d) = pc * lb + pd * ld;
-			return;
+			break;
 		}
 		case SP_TRANSFORMMODE_ONLYTRANSLATION: {
 			float rotationY = rotation + 90 + shearY;
@@ -181,16 +186,18 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			CONST_CAST(float, self->b) = za * lb + zb * ld;
 			CONST_CAST(float, self->c) = zc * la + zd * lc;
 			CONST_CAST(float, self->d) = zc * lb + zd * ld;
-			return;
+			break;
 		}
 	}
-	if (self->skeleton->flipX) {
+	if (self->flipX != self->aflipX) {
 		CONST_CAST(float, self->a) = -self->a;
 		CONST_CAST(float, self->b) = -self->b;
+		//self->aflipX = self->flipX;
 	}
-	if (self->skeleton->flipY != yDown) {
+	if (self->flipY != self->aflipY) {
 		CONST_CAST(float, self->c) = -self->c;
 		CONST_CAST(float, self->d) = -self->d;
+		//self->aflipY = self->flipY;
 	}
 }
 
@@ -202,6 +209,10 @@ void spBone_setToSetupPose (spBone* self) {
 	self->scaleY = self->data->scaleY;
 	self->shearX = self->data->shearX;
 	self->shearY = self->data->shearY;
+	self->flipX = self->data->flipX;
+	self->flipY = self->data->flipY;
+	//self->flippedX = self->flipX;
+	//self->flippedY = self->flipY;
 }
 
 float spBone_getWorldRotationX (spBone* self) {
@@ -235,6 +246,8 @@ void spBone_updateAppliedTransform (spBone* self) {
 		self->ascaleY = SQRT(self->b * self->b + self->d * self->d);
 		self->ashearX = 0;
 		self->ashearY = ATAN2(self->a * self->b + self->c * self->d, self->a * self->d - self->b * self->c) * RAD_DEG;
+		//self->aflipX = self->flipX;
+		//self->aflipY = self->flipY;
 	} else {
 		float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
 		float pid = 1 / (pa * pd - pb * pc);
@@ -251,6 +264,8 @@ void spBone_updateAppliedTransform (spBone* self) {
 		self->ay = (dy * pa * pid - dx * pc * pid);
 		self->ashearX = 0;
 		self->ascaleX = SQRT(ra * ra + rc * rc);
+		//self->aflipX = parent->aflipX ^ self->flipX;
+		//self->aflipY = parent->aflipY ^ self->flipY;
 		if (self->ascaleX > 0.0001f) {
 			float det = ra * rd - rb * rc;
 			self->ascaleY = det / self->ascaleX;
@@ -269,6 +284,10 @@ void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* local
 	float a = self->a, b = self->b, c = self->c, d = self->d;
 	float invDet = 1 / (a * d - b * c);
 	float x = worldX - self->worldX, y = worldY - self->worldY;
+	//if (self->aflipX != (self->aflipY != yDown)) {
+	//	a *= -1;
+	//	d *= -1;
+	//}
 	*localX = (x * d * invDet - y * b * invDet);
 	*localY = (y * a * invDet - x * c * invDet);
 }

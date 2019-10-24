@@ -101,7 +101,10 @@ SP_API void spSkeleton_dispose (spSkeleton* self);
 /* Caches information about bones and constraints. Must be called if bones or constraints, or weighted path attachments
  * are added or removed. */
 SP_API void spSkeleton_updateCache (spSkeleton* self);
-SP_API void spSkeleton_updateWorldTransform (const spSkeleton* self);
+SP_API void spSkeleton_updateWorldTransform(const spSkeleton *self);
+
+/*for flip operation************************************************might be added later*****/
+//SP_API void spUpdateFilp(const spSkeleton *self);
 
 /* Sets the bones, constraints, and slots to their setup pose values. */
 SP_API void spSkeleton_setToSetupPose (const spSkeleton* self);

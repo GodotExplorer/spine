@@ -1220,6 +1220,65 @@ void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameInd
 }
 
 /**/
+
+void _spFlipTimeline_apply(const spTimeline *timeline, spSkeleton *skeleton, float lastTime, float time,
+		spEvent **firedEvents, int *eventsCount, float alpha, spMixPose pose, spMixDirection direction) {
+	spBone *bone;
+	int frameIndex;
+	spFlipTimeline *self = (spFlipTimeline *)timeline;
+	bone = skeleton->bones[self->boneIndex];
+
+	if (time < self->frames[0]) {
+
+		bone->flipX = bone->data->flipX;
+		bone->flipY = bone->data->flipY;
+
+		if (lastTime > time) _spFlipTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventsCount, alpha, pose, direction);
+		return;
+	} else if (lastTime > time) /**/
+		lastTime = -1;
+
+	frameIndex = (time >= self->frames[self->framesCount - 2] ? self->framesCount : binarySearch(self->frames, self->framesCount, time, 2)) - 2;
+	if (self->frames[frameIndex] < lastTime) return;
+
+	if (self->x) 
+		bone->flipX = (int)self->frames[frameIndex + 1];
+	else 
+		bone->flipY = (int)self->frames[frameIndex + 1];
+
+		/* Interpolate between the previous frame and the current frame. ************** Maybe need to be added*********************/
+
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+}
+
+void _spFlipTimeline_dispose(spTimeline *timeline) {
+	spFlipTimeline *self = SUB_CAST(spFlipTimeline, timeline);
+	_spTimeline_deinit(SUPER(self));
+	FREE(self->frames);
+	FREE(self);
+}
+
+int _spFTimeline_getPropertyId(const spTimeline *timeline) {
+	return ((SUB_CAST(spFlipTimeline, timeline)->x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY) << 24) + SUB_CAST(spFlipTimeline, timeline)->boneIndex;
+}
+
+spFlipTimeline *spFlipTimeline_create(int framesCount, int /*bool*/ x) {
+	spFlipTimeline *self = NEW(spFlipTimeline);
+	_spTimeline_init(SUPER(self), (x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY), _spFlipTimeline_dispose, _spFlipTimeline_apply, _spFTimeline_getPropertyId);
+	CONST_CAST(int, self->x) = x;
+	CONST_CAST(int, self->framesCount) = framesCount << 1;
+	CONST_CAST(float *, self->frames) = CALLOC(float, self->framesCount);
+	return self;
+}
+
+void spFlipTimeline_setFrame(spFlipTimeline *self, int frameIndex, float time, int /*bool*/ flip) {
+	frameIndex <<= 1;
+	self->frames[frameIndex] = time;
+	self->frames[frameIndex + 1] = (float)flip;
+}
+
+/**/
 static const int TRANSFORMCONSTRAINT_PREV_TIME = -5;
 static const int TRANSFORMCONSTRAINT_PREV_ROTATE = -4;
 static const int TRANSFORMCONSTRAINT_PREV_TRANSLATE = -3;
