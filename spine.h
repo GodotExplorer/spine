@@ -225,6 +225,15 @@ public:
 	void set_debug_attachment(DebugAttachmentMode p_mode, bool p_enable);
 	bool is_debug_attachment(DebugAttachmentMode p_mode) const;
 
+	void set_debug_attachment_region(bool p_enable);
+	bool is_debug_attachment_region() const;
+	void set_debug_attachment_mesh(bool p_enable);
+	bool is_debug_attachment_mesh() const;
+	void set_debug_attachment_skinned_mesh(bool p_enable);
+	bool is_debug_attachment_skinned_mesh() const;
+	void set_debug_attachment_bounding_box(bool p_enable);
+	bool is_debug_attachment_bounding_box() const;
+
 	//void seek(float p_time, bool p_update = false);
 	//void seek_delta(float p_time, float p_delta);
 	//float get_current_animation_pos() const;

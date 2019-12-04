@@ -1176,6 +1176,38 @@ bool Spine::is_debug_attachment(DebugAttachmentMode p_mode) const {
 	return false;
 }
 
+void Spine::set_debug_attachment_region(bool p_enable) {
+	set_debug_attachment(DEBUG_ATTACHMENT_REGION, p_enable);
+}
+
+bool Spine::is_debug_attachment_region() const {
+	return is_debug_attachment(DEBUG_ATTACHMENT_REGION);
+}
+
+void Spine::set_debug_attachment_mesh(bool p_enable) {
+	set_debug_attachment(DEBUG_ATTACHMENT_MESH, p_enable);
+}
+
+bool Spine::is_debug_attachment_mesh() const {
+	return is_debug_attachment(DEBUG_ATTACHMENT_MESH);
+}
+
+void Spine::set_debug_attachment_skinned_mesh(bool p_enable) {
+	set_debug_attachment(DEBUG_ATTACHMENT_SKINNED_MESH, p_enable);
+}
+
+bool Spine::is_debug_attachment_skinned_mesh() const {
+	return is_debug_attachment(DEBUG_ATTACHMENT_SKINNED_MESH);
+}
+
+void Spine::set_debug_attachment_bounding_box(bool p_enable) {
+	set_debug_attachment(DEBUG_ATTACHMENT_BOUNDING_BOX, p_enable);
+}
+
+bool Spine::is_debug_attachment_bounding_box() const {
+	return is_debug_attachment(DEBUG_ATTACHMENT_BOUNDING_BOX);
+}
+
 void Spine::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_resource", "spine"), &Spine::set_resource);
@@ -1233,6 +1265,15 @@ void Spine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_debug_attachment", "mode", "enable"), &Spine::set_debug_attachment);
 	ClassDB::bind_method(D_METHOD("is_debug_attachment", "mode"), &Spine::is_debug_attachment);
 
+	ClassDB::bind_method(D_METHOD("set_debug_attachment_region", "enable"), &Spine::set_debug_attachment_region);
+	ClassDB::bind_method(D_METHOD("is_debug_attachment_region"), &Spine::is_debug_attachment_region);
+	ClassDB::bind_method(D_METHOD("set_debug_attachment_mesh", "enable"), &Spine::set_debug_attachment_mesh);
+	ClassDB::bind_method(D_METHOD("is_debug_attachment_mesh"), &Spine::is_debug_attachment_mesh);
+	ClassDB::bind_method(D_METHOD("set_debug_attachment_skinned_mesh", "enable"), &Spine::set_debug_attachment_skinned_mesh);
+	ClassDB::bind_method(D_METHOD("is_debug_attachment_skinned_mesh"), &Spine::is_debug_attachment_skinned_mesh);
+	ClassDB::bind_method(D_METHOD("set_debug_attachment_bounding_box", "enable"), &Spine::set_debug_attachment_bounding_box);
+	ClassDB::bind_method(D_METHOD("is_debug_attachment_bounding_box"), &Spine::is_debug_attachment_bounding_box);
+
 	ClassDB::bind_method(D_METHOD("_on_fx_draw"), &Spine::_on_fx_draw);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Fixed,Idle"), "set_animation_process_mode", "get_animation_process_mode");
@@ -1240,6 +1281,10 @@ void Spine::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "active"), "set_active", "is_active");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "skip_frames", PROPERTY_HINT_RANGE, "0, 100, 1"), "set_skip_frames", "get_skip_frames");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_bones"), "set_debug_bones", "is_debug_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_attachment_region"), "set_debug_attachment_region", "is_debug_attachment_region");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_attachment_mesh"), "set_debug_attachment_mesh", "is_debug_attachment_mesh");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_attachment_skinned_mesh"), "set_debug_attachment_skinned_mesh", "is_debug_attachment_skinned_mesh");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_attachment_bounding_box"), "set_debug_attachment_bounding_box", "is_debug_attachment_bounding_box");
 
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_x"), "set_flip_x", "is_flip_x");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "flip_y"), "set_flip_y", "is_flip_y");
