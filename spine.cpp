@@ -1345,6 +1345,10 @@ Rect2 Spine::_edit_get_rect() const {
 	return attached ? Rect2(minX, -minY - h, maxX - minX, h) : Node2D::_edit_get_rect();
 }
 
+bool Spine::_edit_use_rect() const {
+	return skeleton != NULL;
+}
+
 void Spine::_update_verties_count() {
 
 	ERR_FAIL_COND(skeleton == NULL);
