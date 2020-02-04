@@ -65,6 +65,9 @@ char* _spUtil_readFile(const char* p_path, int* p_length) {
 
 	String str_path = String::utf8(p_path);
 	FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
+	if(!f) {
+		ERR_PRINTS(String("Unable to read file :") + String(p_path));
+	}
 	ERR_FAIL_COND_V(!f, NULL);
 
 	*p_length = f->get_len();
@@ -189,16 +192,25 @@ public:
 
 			res->data = spSkeletonJson_readSkeletonDataFile(json, p_path.utf8().get_data());
 			spSkeletonJson_dispose(json);
+#if defined(ERR_FAIL_COND_V_MSG)
+			ERR_FAIL_COND_V_MSG(res->data == NULL, RES(), json->error);
+#else
 			ERR_EXPLAIN(json->error);
 			ERR_FAIL_COND_V(res->data == NULL, RES());
+#endif
 		} else {
 			spSkeletonBinary* bin  = spSkeletonBinary_create(res->atlas);
 			ERR_FAIL_COND_V(bin == NULL, RES());
 			bin->scale = 1;
 			res->data = spSkeletonBinary_readSkeletonDataFile(bin, p_path.utf8().get_data());
 			spSkeletonBinary_dispose(bin);
+#if defined(ERR_FAIL_COND_V_MSG)
+			ERR_FAIL_COND_V_MSG(res->data == NULL, RES(), bin->error);
+#else
 			ERR_EXPLAIN(bin->error);
 			ERR_FAIL_COND_V(res->data == NULL, RES());
+			ERR_FAIL_COND_V_MSG(res->data == NULL, RES(), bin->error);
+#endif
 		}
 
 		res->set_path(p_path);

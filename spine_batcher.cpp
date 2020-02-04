@@ -86,7 +86,7 @@ void SpineBatcher::Elements::draw(RID ci) {
 		p_points,
 		p_colors,
 		p_uvs,
-#if (VERSION_MAJOR == 3 && VERSION_MINOR >= 1)
+#if (VERSION_MAJOR >= 3)
 		Vector<int>(),
 		Vector<float>(),
 #endif
