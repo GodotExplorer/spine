@@ -241,8 +241,10 @@ public:
 
 	//void advance(float p_time);
 
+#ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;
 	virtual bool _edit_use_rect() const;
+#endif
 
 	Spine();
 	virtual ~Spine();
