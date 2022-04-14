@@ -239,7 +239,7 @@ public:
 	}
 };
 
-#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4 && VERSION_PATCH == 3)
+#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4)
 static Ref<ResourceFormatLoaderSpine> resource_loader_spine;
 #else
 static ResourceFormatLoaderSpine *resource_loader_spine = NULL;
@@ -249,7 +249,7 @@ void register_spine_types() {
 
 	ClassDB::register_class<Spine>();
 	ClassDB::register_class<Spine::SpineResource>();
-#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4 && VERSION_PATCH == 3)
+#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4)
 	resource_loader_spine.instance();
 #else
 	resource_loader_spine = memnew( ResourceFormatLoaderSpine );
@@ -263,7 +263,7 @@ void register_spine_types() {
 
 void unregister_spine_types() {
 
-#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4 && VERSION_PATCH == 3)
+#if (VERSION_MAJOR == 3 && VERSION_MINOR == 4)
 	if (resource_loader_spine != nullptr)
 	{
 		resource_loader_spine.unref();
